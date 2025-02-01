@@ -1,0 +1,6 @@
+[Unit]
+After=network.target
+Wants={{ cli_name }}-redis-cache.service {{ cli_name }}-redis-queue.service
+
+[Install]
+WantedBy=multi-user.target

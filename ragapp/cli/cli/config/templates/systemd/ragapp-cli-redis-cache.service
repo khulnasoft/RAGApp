@@ -1,0 +1,12 @@
+[Unit]
+Description="{{ cli_name }}-redis-cache"
+PartOf={{ cli_name }}-redis.target
+
+[Service]
+User={{ user }}
+Group={{ user }}
+Restart=always
+ExecStart={{ redis_server }} {{ redis_cache_config }}
+StandardOutput=file:{{ cli_dir }}/logs/redis-cache.log
+StandardError=file:{{ cli_dir }}/logs/redis-cache.error.log
+WorkingDirectory={{ sites_dir }}

@@ -1,0 +1,25 @@
+---
+- name: Install deps
+  yum:
+    name:
+      - policycoreutils-python
+      - selinux-policy-devel
+    state: present
+  when: ansible_distribution == 'CentOS'
+
+- name: Check enabled SELinux modules
+  shell: semanage module -l
+  register: enabled_modules
+  when: ansible_distribution == 'CentOS'
+
+- name: Copy ragapp_selinux policy
+  copy: src=ragapp_selinux.te dest=/root/ragapp_selinux.te
+  register: dest_ragapp_selinux_te
+  when: ansible_distribution == 'CentOS'
+
+- name: Compile ragapp_selinux policy
+  shell: "make -f /usr/share/selinux/devel/Makefile ragapp_selinux.pp && semodule -i ragapp_selinux.pp"
+  args:
+    chdir: /root/
+  when: "ansible_distribution == 'CentOS' and enabled_modules.stdout.find('ragapp_selinux') == -1 or dest_ragapp_selinux_te.changed"
+...

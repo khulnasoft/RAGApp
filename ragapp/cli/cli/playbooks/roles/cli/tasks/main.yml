@@ -1,0 +1,82 @@
+---
+  - name: Check if /tmp/.cli exists
+    stat:
+      path: /tmp/.cli
+    register: tmp_cli
+
+  - name: Check if cli_repo_path exists
+    stat:
+      path: '{{ cli_repo_path }}'
+    register: cli_repo_register
+
+  - name: move /tmp/.cli if it exists
+    command: 'cp -R /tmp/.cli {{ cli_repo_path }}'
+    when: tmp_cli.stat.exists and not cli_repo_register.stat.exists
+
+  - name: install cli
+    pip:
+      name: '{{ cli_repo_path }}'
+      extra_args: '-e'
+    become: yes
+    become_user: root
+
+  - name: Overwrite cli if required
+    file:
+      state: absent
+      path: "{{ cli_path }}"
+    when: overwrite
+
+  - name: Check whether cli exists
+    stat:
+      path: "{{ cli_path }}"
+    register: cli_stat
+
+  - name: Fix permissions
+    become_user: root
+    command: chown {{ ragapp_user }} -R {{ user_directory }}
+
+  - name:  python3 cli init for develop
+    command: cli init {{ cli_path }} --ragapp-path {{ ragapp_repo_url }} --ragapp-branch {{ ragapp_branch }} --python {{ python }}
+    args:
+      creates: "{{ cli_path }}"
+    when: not cli_stat.stat.exists and not production
+
+  - name: python3 cli init for production
+    command: cli init {{ cli_path }} --ragapp-path {{ ragapp_repo_url }} --ragapp-branch {{ ragapp_branch }} --python {{ python }}
+    args:
+      creates: "{{ cli_path }}"
+    when: not cli_stat.stat.exists and production
+
+  # setup common_site_config
+  - name: setup config
+    command: cli setup config
+    args:
+      creates: "{{ cli_path }}/sites/common_site_config.json"
+      chdir: "{{ cli_path }}"
+
+  - include_tasks: setup_inputrc.yml
+
+  # Setup Procfile
+  - name: Setup Procfile
+    command: cli setup procfile
+    args:
+      creates: "{{ cli_path }}/Procfile"
+      chdir: "{{ cli_path }}"
+
+  # Setup Redis env for RQ
+  - name: Setup Redis
+    command: cli setup redis
+    args:
+      creates: "{{ cli_path }}/config/redis_socketio.conf"
+      chdir: "{{ cli_path }}"
+
+  # Setup an NxERP site
+  - include_tasks: setup_erpnext.yml
+    when: not run_travis
+
+  # Setup Cli for production environment
+  - include_tasks: setup_cli_production.yml
+    vars:
+      cli_path: "{{ user_directory }}/{{ cli_name }}"
+    when: not run_travis and production
+...

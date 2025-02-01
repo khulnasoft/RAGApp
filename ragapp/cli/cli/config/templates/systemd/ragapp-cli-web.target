@@ -1,0 +1,6 @@
+[Unit]
+After=network.target
+Wants={{ cli_name }}-ragapp-web.service {{ cli_name }}-node-socketio.service
+
+[Install]
+WantedBy=multi-user.target

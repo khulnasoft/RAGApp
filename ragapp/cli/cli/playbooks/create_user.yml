@@ -1,0 +1,29 @@
+---
+
+  - hosts: localhost
+    become: yes
+    become_user: root
+    tasks:
+    - name: Create user
+      user:
+        name: '{{ ragapp_user }}'
+        generate_ssh_key: yes
+
+    - name: Set home folder perms
+      file:
+        path: '{{ user_directory }}'
+        mode: 'o+rx'
+        owner: '{{ ragapp_user }}'
+        group: '{{ ragapp_user }}'
+        recurse: yes
+
+    - name: Set /tmp/.cli folder perms
+      file:
+        path: '{{ repo_path }}'
+        owner: '{{ ragapp_user }}'
+        group: '{{ ragapp_user }}'
+        recurse: yes
+
+    - name: Change default shell to bash
+      shell: "chsh {{ ragapp_user }} -s $(which bash)"
+...

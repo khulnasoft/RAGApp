@@ -1,0 +1,13 @@
+[Unit]
+After={{ cli_name }}-ragapp-web.service
+Description="{{ cli_name }}-node-socketio"
+PartOf={{ cli_name }}-web.target
+
+[Service]
+User={{ user }}
+Group={{ user }}
+Restart=always
+ExecStart={{ node }} {{ cli_dir }}/apps/ragapp/socketio.js
+StandardOutput=file:{{ cli_dir }}/logs/node-socketio.log
+StandardError=file:{{ cli_dir }}/logs/node-socketio.error.log
+WorkingDirectory={{ cli_dir }}

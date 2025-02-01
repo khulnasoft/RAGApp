@@ -1,0 +1,13 @@
+**/hooks.py,ragapp.gettext.extractors.navbar.extract
+**/doctype/*/*.json,ragapp.gettext.extractors.doctype.extract
+**/workspace/*/*.json,ragapp.gettext.extractors.workspace.extract
+**/onboarding_step/*/*.json,ragapp.gettext.extractors.onboarding_step.extract
+**/module_onboarding/*/*.json,ragapp.gettext.extractors.module_onboarding.extract
+**/report/*/*.json,ragapp.gettext.extractors.report.extract
+**.py,ragapp.gettext.extractors.python.extract
+**/templates/**.js,ragapp.gettext.extractors.html_template.extract
+**.js,ragapp.gettext.extractors.javascript.extract
+**.html,ragapp.gettext.extractors.html_template.extract
+**.vue,ragapp.gettext.extractors.html_template.extract
+**/custom/*.json,ragapp.gettext.extractors.customization.extract
+**/fixtures/custom_field.json,ragapp.gettext.extractors.custom_field.extract

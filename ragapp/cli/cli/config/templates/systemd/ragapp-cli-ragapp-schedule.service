@@ -1,0 +1,12 @@
+[Unit]
+Description="{{ cli_name }}-ragapp-schedule"
+PartOf={{ cli_name }}-workers.target
+
+[Service]
+User={{ user }}
+Group={{ user }}
+Restart=always
+ExecStart={{ cli_cmd }} schedule
+StandardOutput=file:{{ cli_dir }}/logs/schedule.log
+StandardError=file:{{ cli_dir }}/logs/schedule.error.log
+WorkingDirectory={{ cli_dir }}

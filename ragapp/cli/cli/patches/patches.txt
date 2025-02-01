@@ -1,0 +1,10 @@
+cli.patches.v3.deprecate_old_config
+cli.patches.v3.celery_to_rq
+cli.patches.v3.redis_bind_ip
+cli.patches.v4.update_node
+cli.patches.v4.update_socketio
+cli.patches.v4.install_yarn #2
+cli.patches.v5.fix_user_permissions
+cli.patches.v5.fix_backup_cronjob
+cli.patches.v5.set_live_reload_config
+cli.patches.v5.update_archived_sites

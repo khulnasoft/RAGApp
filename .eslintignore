@@ -1,0 +1,8 @@
+ragapp/public/js/lib/*
+ragapp/public/js/ragapp/misc/tests/*
+ragapp/public/js/ragapp/views/test_runner.js
+ragapp/core/doctype/doctype/boilerplate/*
+ragapp/core/doctype/report/boilerplate/*
+ragapp/public/js/ragapp/class.js
+ragapp/templates/includes/*
+ragapp/www/website_script.js

@@ -1,0 +1,58 @@
+ARG RAGAPP_BRANCH=version-15
+
+FROM ragapp/build:${RAGAPP_BRANCH} AS builder
+
+ARG RAGAPP_BRANCH=version-15
+ARG RAGAPP_PATH=https://github.com/khulnasoft/ragapp
+ARG APPS_JSON_BASE64
+
+USER root
+
+RUN if [ -n "${APPS_JSON_BASE64}" ]; then \
+    mkdir /opt/ragapp && echo "${APPS_JSON_BASE64}" | base64 -d > /opt/ragapp/apps.json; \
+  fi
+
+USER ragapp
+
+RUN export APP_INSTALL_ARGS="" && \
+  if [ -n "${APPS_JSON_BASE64}" ]; then \
+    export APP_INSTALL_ARGS="--apps_path=/opt/ragapp/apps.json"; \
+  fi && \
+  bench init ${APP_INSTALL_ARGS}\
+    --ragapp-branch=${RAGAPP_BRANCH} \
+    --ragapp-path=${RAGAPP_PATH} \
+    --no-procfile \
+    --no-backups \
+    --skip-redis-config-generation \
+    --verbose \
+    /home/ragapp/ragapp-bench && \
+  cd /home/ragapp/ragapp-bench && \
+  echo "{}" > sites/common_site_config.json && \
+  find apps -mindepth 1 -path "*/.git" | xargs rm -fr
+
+FROM ragapp/base:${RAGAPP_BRANCH} AS backend
+
+USER ragapp
+
+COPY --from=builder --chown=ragapp:ragapp /home/ragapp/ragapp-bench /home/ragapp/ragapp-bench
+
+WORKDIR /home/ragapp/ragapp-bench
+
+VOLUME [ \
+  "/home/ragapp/ragapp-bench/sites", \
+  "/home/ragapp/ragapp-bench/sites/assets", \
+  "/home/ragapp/ragapp-bench/logs" \
+]
+
+CMD [ \
+  "/home/ragapp/ragapp-bench/env/bin/gunicorn", \
+  "--chdir=/home/ragapp/ragapp-bench/sites", \
+  "--bind=0.0.0.0:8000", \
+  "--threads=4", \
+  "--workers=2", \
+  "--worker-class=gthread", \
+  "--worker-tmp-dir=/dev/shm", \
+  "--timeout=120", \
+  "--preload", \
+  "ragapp.app:application" \
+]

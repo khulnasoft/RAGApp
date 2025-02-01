@@ -1,0 +1,28 @@
+---
+- name: Setup production
+  become: yes
+  become_user: root
+  command: cli setup production {{ ragapp_user }} --yes
+  args:
+    chdir: '{{ cli_path }}'
+
+- name: Setup Sudoers
+  become: yes
+  become_user: root
+  command: cli setup sudoers {{ ragapp_user }}
+  args:
+    chdir: '{{ cli_path }}'
+
+- name: Set correct permissions on cli.log
+  file:
+    path: '{{ cli_path }}/logs/cli.log'
+    owner: '{{ ragapp_user }}'
+    group: '{{ ragapp_user }}'
+  become: yes
+  become_user: root
+
+- name: Restart the cli
+  command: cli restart
+  args:
+    chdir: '{{ cli_path }}'
+...

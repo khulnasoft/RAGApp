@@ -1,0 +1,12 @@
+[Unit]
+Description="{{ cli_name }}-ragapp-short-worker %I"
+PartOf={{ cli_name }}-workers.target
+
+[Service]
+User={{ user }}
+Group={{ user }}
+Restart=always
+ExecStart={{ cli_cmd }} worker --queue short
+StandardOutput=file:{{ cli_dir }}/logs/worker.log
+StandardError=file:{{ cli_dir }}/logs/worker.error.log
+WorkingDirectory={{ cli_dir }}
